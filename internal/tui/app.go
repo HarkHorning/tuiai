@@ -199,7 +199,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				} else {
 					result = content
 				}
-				m.aiClient.AddMessage("assistant", "[Read File "+fname+"]")
+				m.aiClient.AddMessage("assistant", fmt.Sprintf("[Tool Result read_file %s]: %s", fname, result))
 				m.chatLog = append(m.chatLog, fmt.Sprintf("AI: [Read file %s]", fname))
 
 			case "write_file":
