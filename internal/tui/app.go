@@ -78,6 +78,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+		if m.width > 10 {
+		    m.textInput.Width = m.width - 8
+	    	}
 		return m, nil
 
 	case tea.KeyMsg:
@@ -226,11 +229,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case spinner.TickMsg:
-		if m.thinking {
-			var cmd tea.Cmd
-			m.spinner, cmd = m.spinner.Update(msg)
-			return m, cmd
-		}
+		var cmd tea.Cmd
+		m.spinner, cmd = m.spinner.Update(msg)
+		return m, cmd
 	}
 
 	m.textInput, cmd = m.textInput.Update(msg)
@@ -269,6 +270,19 @@ func (m *Model) View() string {
 		return boxStyle.Render(reviewText)
 
 	case StateChat:
+		
+		// new
+		boxWidth := m.width - 4
+		if boxWidth < 40 {
+			boxWidth = 75
+		}
+
+		boxStyle := lipgloss.NewStyle().
+		    Border(lipgloss.NormalBorder()).
+		    BorderForeground(lipgloss.Color("240")).
+		    Padding(1, 2).
+		    Width(boxWidth)
+
 		var sb strings.Builder
 		sb.WriteString(titleStyle.Render("TUIAI // Book Editor (Local)") + "\n")
 
