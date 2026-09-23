@@ -31,6 +31,9 @@ type Model struct {
 	chatLog     []string
 	width       int
 	height      int
+	thinkingPhrases []string
+	thinkingIndex int
+	tickCounter int
 
 	// Pending file action for review
 	pendingAction   string
@@ -63,6 +66,24 @@ func InitialModel() (*Model, error) {
 		chatLog: []string{
 			"=== TUIAI Book Assistant initialized ===",
 			"Type /help for available commands or start chatting with your notes.",
+		},		
+		thinkingPhrases:[]string{
+			"Thinkifying",
+			"Ponjulating",
+			"Consulting my stupidity",
+			"Ideating...",
+			"Congesting",
+			"Hmmm...",
+			"Plotting",
+			"Finding snacks",
+			"cheweing",
+			"Lightbulb?",
+			"Eureka?!?",
+			"I knew the answer...",
+			"Look! A butterfly!",
+			"Let me think...",
+			"Researching",
+			"Interpreting",
 		},
 	}, nil
 }
@@ -231,6 +252,13 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case spinner.TickMsg:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
+
+		if m.thinking {
+			m.tickCounter++
+			if m.tickCounter%15 == 0 {
+				m.thinkingIndex = (m.thinkingIndex + 1) % len(m.thinkingPhrases)
+			}
+		}
 		return m, cmd
 	}
 
@@ -284,7 +312,7 @@ func (m *Model) View() string {
 		    Width(boxWidth)
 
 		var sb strings.Builder
-		sb.WriteString(titleStyle.Render("TUIAI // Book Editor (Local)") + "\n")
+		sb.WriteString(titleStyle.Render("TUIAI // Assistant (Local)") + "\n")
 
 		// Render recent chat log lines
 		startIdx := 0
@@ -297,7 +325,12 @@ func (m *Model) View() string {
 
 		sb.WriteString("\n")
 		if m.thinking {
-			sb.WriteString(m.spinner.View() + " AI is thinking...\n")
+			//sb.WriteString(m.spinner.View() + " AI is thinking...\n")
+
+			currentPhrase := m.thinkingPhrases[m.thinkingIndex]
+			sb.WriteString(m.spinner.View() + " " + currentPhrase + "\n")
+			
+			//
 		} else {
 			sb.WriteString(m.textInput.View() + "\n")
 		}
